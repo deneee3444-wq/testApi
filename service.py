@@ -1337,14 +1337,14 @@ def get_available_models(mode=None):
 
 def make_proxy_url(raw_url):
     """
-    Wraps a direct media URL with the local /api/proxy endpoint.
+    Doğrudan ham medya URL'sini döner (proxy sarmalamasını devre dışı bırakır).
     """
     if not raw_url or not isinstance(raw_url, str):
         return raw_url
-    if raw_url.startswith("/api/proxy"):
-        return raw_url
-    import urllib.parse
-    return f"/api/proxy?url={urllib.parse.quote(raw_url, safe='')}"
+    if raw_url.startswith("/api/proxy?url="):
+        import urllib.parse
+        return urllib.parse.unquote(raw_url.split("/api/proxy?url=", 1)[1])
+    return raw_url
 
 
 from bs4 import BeautifulSoup
