@@ -3262,7 +3262,7 @@ def get_or_create_active_account(api_key_id, task_id=None, force_new=False):
     return None, None
 
 def deduct_api_key_quota(api_key_id, task_id=None, amount=1):
-    """Deducts `amount` (e.g. 15 for images, 50/55 for videos) accounts/quotas from the API key's available accounts upon successful task completion.
+    """Deducts `amount` (default 1) accounts/quotas from the API key's available accounts upon successful task completion.
     Prioritizes accounts other than the currently active working account so the active account remains intact in DB.
     Even if the active account's DB row is consumed, its in-memory session (ACTIVE_ACCOUNTS) stays fully operational.
     """
@@ -3385,10 +3385,10 @@ def process_image_task(task_id, params, api_key_id):
         batch_size = int(params.get('batch_size', 1))
 
         # Determine API quota to deduct for image model
-        model_api_credit = 15
+        model_api_credit = 1
         for m in AVAILABLE_MODELS.get('image', []):
             if m.get('id') == raw_model or m.get('id') == model:
-                model_api_credit = m.get('credit', 15)
+                model_api_credit = m.get('credit', 1)
                 break
         total_quota_to_deduct = model_api_credit * batch_size
 
@@ -3555,10 +3555,10 @@ def process_video_task(task_id, params, api_key_id):
         sound = params.get('sound', 'vendor')
 
         # Determine API quota to deduct for video model
-        model_api_credit = 50
+        model_api_credit = 1
         for m in AVAILABLE_MODELS.get('video', []):
             if m.get('id') == raw_model or m.get('id') == model:
-                model_api_credit = m.get('credit', 50)
+                model_api_credit = m.get('credit', 1)
                 break
 
         input_mode = "TextToVideo"
