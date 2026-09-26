@@ -1319,6 +1319,11 @@ AVAILABLE_MODELS = {
                 "TextToVideo": ["480p", "720p", "1080p"],
                 "ReferenceToVideo": ["480p", "720p", "1080p"],
             },
+            "constraints": [
+                {"if": {"resolution": "1080p"}, "then": {"duration": list(range(4, 13))}},
+                {"if": {"resolution": "720p"}, "then": {"duration": list(range(4, 26))}},
+                {"if": {"resolution": "480p"}, "then": {"duration": list(range(4, 31))}},
+            ],
             "default_size": "16:9",
             "default_resolution": "720p",
             "default_duration": 5,
