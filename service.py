@@ -532,6 +532,11 @@ VIDEO_MODELS_CONFIG = {
         "supported_aspect_ratios": ["16:9", "9:16", "1:1"],
         "supported_durations": list(range(4, 31)),
         "duration_config": {'type': 'continuous', 'min': 4, 'max': 30, 'step': 1, 'default': 5},
+        "duration_config_by_resolution": {
+            "1080p": {'type': 'continuous', 'min': 4, 'max': 12, 'step': 1, 'default': 5},
+            "720p": {'type': 'continuous', 'min': 4, 'max': 25, 'step': 1, 'default': 5},
+            "480p": {'type': 'continuous', 'min': 4, 'max': 30, 'step': 1, 'default': 5},
+        },
         "supported_resolutions_by_mode": {
             "ImageToVideo": ["480p", "720p", "1080p"],
             "TextToVideo": ["480p", "720p", "1080p"],
@@ -1317,6 +1322,12 @@ AVAILABLE_MODELS = {
             "default_size": "16:9",
             "default_resolution": "720p",
             "default_duration": 5,
+            "duration_config": {'type': 'continuous', 'min': 4, 'max': 30, 'step': 1, 'default': 5},
+            "duration_config_by_resolution": {
+                "1080p": {'type': 'continuous', 'min': 4, 'max': 12, 'step': 1, 'default': 5},
+                "720p": {'type': 'continuous', 'min': 4, 'max': 25, 'step': 1, 'default': 5},
+                "480p": {'type': 'continuous', 'min': 4, 'max': 30, 'step': 1, 'default': 5},
+            },
             "max_prompt_length": 20000
         },
         {
@@ -1410,6 +1421,20 @@ def get_available_models(mode=None):
             model['supported_resolutions_by_mode'] = by_mode_res
         if by_mode_dur:
             model['supported_durations_by_mode'] = by_mode_dur
+
+        # Pass through duration_config and per-resolution duration constraints
+        if 'duration_config' in config and 'duration_config' not in model:
+            model['duration_config'] = config['duration_config']
+        if 'duration_config_by_resolution' in config and 'duration_config_by_resolution' not in model:
+            model['duration_config_by_resolution'] = config['duration_config_by_resolution']
+        if 'supported_durations_by_resolution' not in model:
+            # Build from duration_config_by_resolution if available
+            dcbr = config.get('duration_config_by_resolution')
+            if dcbr:
+                model['supported_durations_by_resolution'] = {
+                    res: list(range(dc['min'], dc['max'] + 1, dc.get('step', 1)))
+                    for res, dc in dcbr.items() if dc.get('type') == 'continuous'
+                }
     if mode:
         return models.get(mode, [])
     return models
